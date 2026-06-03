@@ -379,7 +379,47 @@ footer{
 .rev{opacity:0;transform:translateY(24px);transition:opacity 0.7s ease,transform 0.7s ease}
 .rev.vis{opacity:1;transform:translateY(0)}
 
-/* scrollbar */
+/* ── LIQUID GLASS CARD BLOBS ── */
+.packages{position:relative}
+.pkg-bg-blob{
+  position:absolute;border-radius:50%;
+  filter:blur(80px);pointer-events:none;z-index:0;
+}
+.pkg-blob-red{
+  width:420px;height:420px;
+  background:rgba(255,68,85,0.13);
+  top:10%;left:0%;
+  animation:orbF 16s ease-in-out infinite;
+}
+.pkg-blob-blue{
+  width:400px;height:400px;
+  background:rgba(59,158,255,0.12);
+  top:10%;right:0%;
+  animation:orbF 18s ease-in-out infinite;
+  animation-delay:-6s;
+}
+.pkg-blob-mid{
+  width:300px;height:300px;
+  background:rgba(120,80,255,0.07);
+  top:40%;left:40%;
+  animation:orbF 22s ease-in-out infinite;
+  animation-delay:-11s;
+}
+.packages-inner{position:relative;z-index:1}
+
+/* inner color wash layer inside each card */
+.pkg-wash{
+  position:absolute;inset:0;pointer-events:none;border-radius:24px;z-index:0;
+  opacity:0.55;
+  transition:opacity 0.35s;
+}
+.pkg.red .pkg-wash{background:radial-gradient(ellipse at 20% 0%,rgba(255,68,85,0.18) 0%,transparent 65%)}
+.pkg.blue .pkg-wash{background:radial-gradient(ellipse at 80% 0%,rgba(59,158,255,0.16) 0%,transparent 65%)}
+.pkg:hover .pkg-wash{opacity:0.8}
+
+/* make all direct children of pkg sit above wash */
+.pkg > *:not(.pkg-wash):not(.pkg-accent):not(.pkg::after){position:relative;z-index:1}
+
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-track{background:var(--bg)}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:2px}
@@ -461,6 +501,11 @@ footer{
 
 <!-- PACKAGES -->
 <section class="packages" id="servicos">
+  <!-- background blobs that make the glass blur visible -->
+  <div class="pkg-bg-blob pkg-blob-red"></div>
+  <div class="pkg-bg-blob pkg-blob-blue"></div>
+  <div class="pkg-bg-blob pkg-blob-mid"></div>
+
   <div class="packages-inner">
     <div class="packages-head rev">
       <div class="sec-eyebrow">Pacotes</div>
@@ -472,6 +517,8 @@ footer{
       <!-- Otimização Padrão -->
       <div class="pkg red rev">
         <div class="pkg-accent"></div>
+        <!-- inner color wash -->
+        <div class="pkg-wash"></div>
         <div class="pkg-label"><span class="pkg-label-dot"></span>Mais Popular</div>
         <h3 class="pkg-name">Otimização Padrão</h3>
         <p class="pkg-desc">Mais desempenho com ferramentas e guias completos para você aplicar.</p>
@@ -491,6 +538,7 @@ footer{
       <!-- Serviço Remoto -->
       <div class="pkg blue rev" style="transition-delay:.1s">
         <div class="pkg-accent"></div>
+        <div class="pkg-wash"></div>
         <div class="pkg-label"><span class="pkg-label-dot"></span>Premium</div>
         <h3 class="pkg-name">Serviço Remoto</h3>
         <p class="pkg-desc">Otimização completa feita por mim, diretamente no seu dispositivo, remotamente.</p>
