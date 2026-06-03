@@ -113,7 +113,11 @@ h1{
   letter-spacing:-0.03em;
   margin-bottom:24px;
   animation:fadeUp 0.8s ease 0.1s both;
+  display:block;
+  width:100%;
 }
+/* override glitch class so it doesn't break layout */
+h1.h1-glitch{display:block!important;width:100%!important}
 h1 .blue{color:var(--blue)}
 .hero-sub{
   font-size:1rem;font-weight:300;
@@ -453,7 +457,7 @@ footer{
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">
-    <img src="logo.jpeg" alt="Logo" onerror="this.style.display='none'">
+    <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
     <span>PC DO <em>FRACO</em></span>
   </a>
   <ul class="nav-links">
@@ -613,25 +617,295 @@ footer{
 <!-- FOOTER -->
 <footer>
   <div class="foot-brand">
-    <img src="logo.jpeg" alt="Logo" onerror="this.style.display='none'">
+    <img src="logo.png" alt="Logo" onerror="this.style.display='none'">
     PC DO FRACO
   </div>
   <div class="foot-copy">© 2026 PC do Fraco. Todos os direitos reservados.</div>
 </footer>
 
+<!-- Custom cursor -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<!-- Cursor trail particles -->
+<canvas id="trail-canvas"></canvas>
+
+<style>
+/* ── CUSTOM CURSOR ── */
+*{cursor:none!important}
+#cursor-dot{
+  position:fixed;width:8px;height:8px;
+  background:#fff;border-radius:50%;
+  pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  transition:transform 0.08s ease, background 0.2s, width 0.2s, height 0.2s;
+  mix-blend-mode:difference;
+}
+#cursor-ring{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(59,158,255,0.7);
+  border-radius:50%;
+  pointer-events:none;z-index:99998;
+  transform:translate(-50%,-50%);
+  transition:width 0.25s ease, height 0.25s ease, border-color 0.25s, opacity 0.25s, transform 0.1s ease;
+  backdrop-filter:invert(0.06);
+}
+body.cursor-hover #cursor-dot{width:12px;height:12px;background:var(--blue)}
+body.cursor-hover #cursor-ring{width:52px;height:52px;border-color:rgba(59,158,255,0.9);border-width:1.5px}
+body.cursor-click #cursor-dot{transform:translate(-50%,-50%) scale(0.5)}
+body.cursor-click #cursor-ring{transform:translate(-50%,-50%) scale(0.85);opacity:0.6}
+
+/* Trail canvas */
+#trail-canvas{position:fixed;inset:0;pointer-events:none;z-index:99990;opacity:0.55}
+
+/* ── MAGNETIC CARD EFFECT ── */
+.pkg{will-change:transform}
+
+/* ── PARALLAX SPHERES ── */
+.sphere{will-change:transform}
+
+/* ── PARTICLE BURST on click ── */
+.burst-particle{
+  position:fixed;border-radius:50%;
+  pointer-events:none;z-index:99997;
+  animation:burst 0.7s ease-out forwards;
+}
+@keyframes burst{
+  0%{opacity:1;transform:translate(0,0) scale(1)}
+  100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}
+}
+
+/* ── GLITCH TEXT on hero ── */
+@keyframes glitch1{
+  0%,100%{clip-path:inset(0 0 90% 0);transform:translate(-3px,0)}
+  33%{clip-path:inset(40% 0 40% 0);transform:translate(3px,0)}
+  66%{clip-path:inset(70% 0 10% 0);transform:translate(-2px,0)}
+}
+@keyframes glitch2{
+  0%,100%{clip-path:inset(85% 0 0 0);transform:translate(3px,0)}
+  33%{clip-path:inset(20% 0 60% 0);transform:translate(-3px,0)}
+  66%{clip-path:inset(55% 0 25% 0);transform:translate(2px,0)}
+}
+.glitch-word{position:relative;display:inline-block}
+.glitch-word::before,.glitch-word::after{
+  content:attr(data-text);
+  position:absolute;inset:0;
+  opacity:0;pointer-events:none;
+  color:inherit;
+}
+.glitch-word::before{color:#ff4455}
+.glitch-word::after{color:#3b9eff}
+.glitch-word.glitching::before{opacity:0.75;animation:glitch1 0.3s steps(2) forwards}
+.glitch-word.glitching::after{opacity:0.75;animation:glitch2 0.3s steps(2) forwards}
+
+/* ── STATS COUNTER ── */
+.snum[data-target]{transition:color 0.3s}
+
+/* ── SCROLL PROGRESS ── */
+#scroll-bar{
+  position:fixed;top:0;left:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),#80d0ff);
+  z-index:9999;width:0%;
+  box-shadow:0 0 8px var(--blue-glow);
+  transition:width 0.1s linear;
+}
+</style>
+
+<!-- Scroll progress bar -->
+<div id="scroll-bar"></div>
+
 <script>
+/* ── SCROLL REVEAL ── */
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if(e.isIntersecting){ e.target.classList.add('vis'); obs.unobserve(e.target); }
   });
 }, {threshold:0.1});
 document.querySelectorAll('.rev').forEach(el => obs.observe(el));
+
+/* ── SMOOTH ANCHOR SCROLL ── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const t = document.querySelector(a.getAttribute('href'));
     if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
   });
 });
+
+/* ── SCROLL PROGRESS BAR ── */
+const scrollBar = document.getElementById('scroll-bar');
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  scrollBar.style.width = Math.min(pct, 100) + '%';
+}, {passive:true});
+
+/* ── CUSTOM CURSOR ── */
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px';
+  dot.style.top  = my + 'px';
+});
+
+// Ring follows with lag
+function animRing(){
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+// Hover state on interactive elements
+document.querySelectorAll('a, button, .pkg, .scard, .afeat').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
+document.addEventListener('mousedown', () => document.body.classList.add('cursor-click'));
+document.addEventListener('mouseup',   () => document.body.classList.remove('cursor-click'));
+
+/* ── CURSOR TRAIL CANVAS ── */
+const canvas = document.getElementById('trail-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width  = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+const trail = [];
+const MAX_TRAIL = 28;
+document.addEventListener('mousemove', e => {
+  trail.push({x: e.clientX, y: e.clientY, age: 0});
+  if(trail.length > MAX_TRAIL) trail.shift();
+});
+
+function drawTrail(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for(let i = 0; i < trail.length; i++){
+    const p = trail[i];
+    p.age++;
+    const prog  = i / trail.length;
+    const alpha = prog * 0.35;
+    const size  = prog * 4;
+    const hue   = 200 + prog * 40; // blue to cyan
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${hue}, 100%, 70%, ${alpha})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(drawTrail);
+}
+drawTrail();
+
+/* ── CLICK BURST PARTICLES ── */
+document.addEventListener('click', e => {
+  const count = 10;
+  for(let i = 0; i < count; i++){
+    const p = document.createElement('div');
+    p.className = 'burst-particle';
+    const angle = (i / count) * Math.PI * 2;
+    const dist  = 40 + Math.random() * 40;
+    const size  = 3 + Math.random() * 4;
+    const hue   = Math.random() > 0.5 ? 210 : 0; // blue or red
+    p.style.cssText = `
+      left:${e.clientX}px;top:${e.clientY}px;
+      width:${size}px;height:${size}px;
+      background:hsl(${hue},100%,70%);
+      --tx:${Math.cos(angle)*dist}px;
+      --ty:${Math.sin(angle)*dist}px;
+      animation-duration:${0.5 + Math.random()*0.3}s;
+    `;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
+});
+
+/* ── PARALLAX SPHERES on mousemove ── */
+const spheres = document.querySelectorAll('.sphere');
+const speeds  = [0.018, 0.032, 0.024, 0.042];
+document.addEventListener('mousemove', e => {
+  const cx = window.innerWidth  / 2;
+  const cy = window.innerHeight / 2;
+  const dx = e.clientX - cx;
+  const dy = e.clientY - cy;
+  spheres.forEach((s, i) => {
+    const sp = speeds[i] || 0.02;
+    s.style.transform = `translate(${dx * sp}px, ${dy * sp}px)`;
+  });
+});
+
+/* ── MAGNETIC CARDS ── */
+document.querySelectorAll('.pkg').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r   = card.getBoundingClientRect();
+    const cx  = r.left + r.width  / 2;
+    const cy  = r.top  + r.height / 2;
+    const dx  = (e.clientX - cx) / (r.width  / 2);
+    const dy  = (e.clientY - cy) / (r.height / 2);
+    const rotX = dy * -6;
+    const rotY = dx *  6;
+    card.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-6px) scale(1.01)`;
+    // move shine with mouse
+    const after = card.querySelector('.pkg-wash');
+    if(after){
+      const px = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+      const py = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+      if(card.classList.contains('red'))
+        after.style.background = `radial-gradient(ellipse at ${px}% ${py}%, rgba(255,68,85,0.22) 0%, transparent 65%)`;
+      else
+        after.style.background = `radial-gradient(ellipse at ${px}% ${py}%, rgba(59,158,255,0.2) 0%, transparent 65%)`;
+    }
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.transition = 'transform 0.55s ease, box-shadow 0.35s ease';
+    setTimeout(() => card.style.transition = '', 550);
+    const after = card.querySelector('.pkg-wash');
+    if(after) after.style.background = '';
+  });
+});
+
+/* ── GLITCH HERO TITLE ── */
+const glitchTarget = document.querySelector('h1 .blue');
+if(glitchTarget){
+  glitchTarget.classList.add('glitch-word');
+  glitchTarget.setAttribute('data-text', glitchTarget.textContent);
+  setInterval(() => {
+    glitchTarget.classList.add('glitching');
+    setTimeout(() => glitchTarget.classList.remove('glitching'), 320);
+  }, 5000);
+}
+
+/* ── ANIMATED STAT COUNTERS ── */
+const statNums = document.querySelectorAll('.snum');
+const countObs = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if(!entry.isIntersecting) return;
+    const el   = entry.target;
+    const blue = el.querySelector('.blue');
+    if(!blue) return;
+    const raw = blue.textContent.replace(/[^0-9]/g,'');
+    const target = parseInt(raw);
+    if(isNaN(target)) return;
+    let start = 0;
+    const dur = 1600;
+    const t0  = performance.now();
+    function tick(now){
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      blue.textContent = Math.floor(ease * target);
+      if(p < 1) requestAnimationFrame(tick);
+      else blue.textContent = target;
+    }
+    requestAnimationFrame(tick);
+    countObs.unobserve(el);
+  });
+}, {threshold:0.5});
+statNums.forEach(el => countObs.observe(el));
 </script>
 </body>
 </html>
