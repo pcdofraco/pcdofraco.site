@@ -1,0 +1,36 @@
+# PC do Fraco
+
+> Serviço de otimização de PC de alta performance via software, 100% remoto, sem necessidade de upgrade físico de hardware.
+
+## Sobre
+
+PC do Fraco é um serviço brasileiro de otimização de computadores focado em aumentar o desempenho de PCs para jogos e uso geral através de ajustes de software, sem que o cliente precise comprar peças novas. O serviço é prestado 100% remotamente, de forma segura.
+
+- Site: https://pcdofraco.com
+- WhatsApp: +55 82 98876-5748
+- Discord: https://discord.gg/Kbk8sgXewq
+- Atendimento: Brasil inteiro (remoto)
+
+## Serviços
+
+- **Otimização Padrão** (R$16,82): Inclui APP PC do Fraco, manual de otimizações em PDF, otimizações executáveis e painel otimizador externo.
+- **Serviço Remoto** (R$35,00): Otimização completa feita diretamente no dispositivo do cliente de forma remota, incluindo otimizações personalizadas e configurações extras.
+
+## APP PC do Fraco
+
+Ferramenta exclusiva incluída em todos os pacotes com:
+- Dashboard de monitoramento em tempo real
+- Tweaks de registro do Windows (.REG)
+- Otimização de desempenho em 1 clique
+- Manual PDF completo de otimizações
+
+## Resultados
+
+- Ganho médio de +300% de FPS em jogos
+- Redução significativa de uso de RAM
+- Limpeza de arquivos temporários
+- Sem necessidade de comprar peças novas
+
+## Contato
+
+Para contratar ou saber mais, acesse https://pcdofraco.com ou entre em contato pelo WhatsApp: +55 82 98876-5748
